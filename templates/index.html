@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+
+<title>IPL Auction Analytics</title>
+
+<link rel="stylesheet" href="/static/index_style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div class="header">
+🏏 IPL Auction Analytics Dashboard
+</div>
+
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+
+<div class="alerts">
+
+{% for category, message in messages %}
+
+<div class="alert {{category}}">
+{{message}}
+</div>
+{% endfor %}
+
+</div>
+{% endif %}
+{% endwith %}
+
+<div class="container">
+
+<div class="topbar">
+
+<div class="user-info">
+Welcome <b>{{username}}</b>
+
+{% if role == "user" %}
+| Team: <b>{{team}}</b> | Purse: ₹{{purse}}
+{% endif %}
+
+</div>
+
+<input class="search" id="search" placeholder="🔎 Search Player">
+
+<a href="/logout" class="logout">Logout</a>
+
+</div>
+
+{% if role and role.lower() == "admin" %}
+
+<div class="admin-form">
+
+<h3>Add Player</h3>
+
+<form method="POST" action="/add_player">
+
+<input name="name" placeholder="Name" required>
+<input name="runs" placeholder="Runs">
+<input name="wickets" placeholder="Wickets">
+<input name="bat_avg" placeholder="Bat Avg">
+<input name="bowl_avg" placeholder="Bowl Avg">
+
+<button>Add</button>
+
+</form>
+
+<br>
+
+<form method="POST" action="/reset_auction">
+<button class="resetBtn">Reset Full Auction</button>
+</form>
+
+</div>
+
+{% endif %}
+
+<table id="playerTable">
+
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Runs</th>
+<th>Wickets</th>
+<th>Bat Avg</th>
+<th>Bowl Avg</th>
+<th>Base Price</th>
+<th>Current Bid</th>
+<th>Team</th>
+<th>Bid</th>
+{% if role|lower == "admin" %}
+<th>Admin</th>
+{% endif %}
+</tr>
+
+{% for p in players %}
+
+<tr>
+
+<td>{{p[0]}}</td>
+
+<td onclick="showCharts('{{p[1]}}',{{p[2]}},{{p[3]}},{{p[4]}},{{p[5]}},{{p[7]}},{{p[8]}})">
+{{p[1]}}
+</td>
+
+<td>{{p[2]}}</td>
+<td>{{p[3]}}</td>
+
+<td>{{p[4]}}</td>
+<td>{{p[5]}}</td>
+
+<td>₹{{p[7]}}</td>
+<td>₹{{p[8]}}</td>
+
+<td>
+{% if p[6] %}
+{{p[6]}}
+{% else %}
+Unsold
+{% endif %}
+</td>
+
+<!-- BID COLUMN (VISIBLE TO EVERYONE) -->
+
+<td>
+
+{% if role == "user" %}
+
+<form method="POST" action="/bid/{{p[0]}}" onsubmit="event.stopPropagation();">
+
+<input type="number" name="price" min="{{p[8]+1}}" required>
+
+<button>Bid</button>
+
+</form>
+
+{% else %}
+
+—
+
+{% endif %}
+
+</td>
+
+<!-- ADMIN COLUMN -->
+
+{% if role|lower == "admin" %}
+
+<td>
+
+<form method="POST" action="/reset_player/{{p[0]}}" onsubmit="event.stopPropagation();">
+
+<button class="resetPlayerBtn">Reset</button>
+
+</form>
+
+</td>
+
+{% endif %}
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+<!-- PLAYER ANALYTICS MODAL -->
+
+<div class="modal" id="chartModal">
+
+<div class="modal-content">
+
+<div class="player-title" id="playerName"></div>
+
+<div class="chart">
+<canvas id="performanceChart"></canvas>
+</div>
+
+<div class="chart">
+<canvas id="radarChart"></canvas>
+</div>
+
+<div class="chart">
+<canvas id="doughnutChart"></canvas>
+</div>
+
+<div class="chart">
+<canvas id="auctionChart"></canvas>
+</div>
+
+<br>
+
+<button onclick="closeModal()">Close</button>
+
+</div>
+
+</div>
+
+<script>
+
+/* SEARCH */
+
+document.getElementById("search").addEventListener("keyup",function(){
+
+let filter=this.value.toLowerCase()
+let rows=document.querySelectorAll("#playerTable tr")
+
+rows.forEach((row,i)=>{
+
+if(i===0) return
+
+let name=row.children[1].innerText.toLowerCase()
+
+row.style.display=name.includes(filter)?"":"none"
+
+})
+
+})
+
+
+/* CHARTS */
+
+let charts=[]
+
+function destroyCharts(){
+charts.forEach(c=>c.destroy())
+charts=[]
+}
+
+function showCharts(name,runs,wickets,bat,bowl,base,current){
+
+document.getElementById("chartModal").style.display="flex"
+document.getElementById("playerName").innerText=name
+
+destroyCharts()
+
+charts.push(new Chart(
+document.getElementById("performanceChart"),{
+type:"bar",
+data:{
+labels:["Runs","Wickets","Bat Avg","Bowl Avg"],
+datasets:[{
+label:"Performance",
+data:[runs,wickets,bat,bowl]
+}]
+}
+}
+))
+
+charts.push(new Chart(
+document.getElementById("radarChart"),
+{
+type:"radar",
+data:{
+labels:["Runs","Wickets","Bat Avg","Bowl Avg"],
+datasets:[
+{
+label:"Skill Profile",
+data:[
+runs/100,
+wickets*5,
+bat,
+bowl
+],
+backgroundColor:"rgba(59,130,246,0.2)",
+borderColor:"rgba(59,130,246,1)",
+borderWidth:2,
+pointBackgroundColor:"rgba(59,130,246,1)"
+}
+]
+},
+options:{
+responsive:true,
+plugins:{
+legend:{
+labels:{
+color:"white"
+}
+}
+},
+scales:{
+r:{
+beginAtZero:true,
+ticks:{
+color:"white"
+},
+grid:{
+color:"rgba(255,255,255,0.1)"
+},
+angleLines:{
+color:"rgba(255,255,255,0.1)"
+},
+pointLabels:{
+color:"white"
+}
+}
+}
+}
+}
+))
+
+charts.push(new Chart(
+document.getElementById("doughnutChart"),{
+type:"doughnut",
+data:{
+labels:["Runs","Wickets"],
+datasets:[{
+data:[runs,wickets]
+}]
+}
+}
+))
+
+charts.push(new Chart(
+document.getElementById("auctionChart"),{
+type:"bar",
+data:{
+labels:["Base Price","Current Bid"],
+datasets:[{
+label:"Auction Value",
+data:[base,current]
+}]
+}
+}
+))
+
+}
+
+function closeModal(){
+document.getElementById("chartModal").style.display="none"
+destroyCharts()
+}
+
+</script>
+
+</body>
+</html>

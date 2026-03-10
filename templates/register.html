@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Register</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+<div class="glass-card">
+
+<h2>Create Account</h2>
+
+<form method="POST">
+
+<input name="name" placeholder="Name" required>
+
+<input name="email" placeholder="Email" required>
+
+<input name="password" type="password" placeholder="Password" required>
+
+<select name="team" required>
+    <option value="" disabled selected>Select Your Team</option>
+    <option value="CSK">CSK</option>
+    <option value="MI">MI</option>
+    <option value="RCB">RCB</option>
+    <option value="KKR">KKR</option>
+    <option value="SRH">SRH</option>
+    <option value="DC">DC</option>
+    <option value="RR">RR</option>
+    <option value="PBKS">PBKS</option>
+    <option value="LSG">LSG</option>
+    <option value="GT">GT</option>
+</select>
+
+<select name="role">
+<option value="user">User</option>
+<option value="admin">Admin</option>
+</select>
+
+<button>Register</button>
+
+<a href="/login">Login</a>
+
+</form>
+
+</div>
+
+</body>
+</html>

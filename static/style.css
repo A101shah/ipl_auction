@@ -1,0 +1,167 @@
+/* ---------------- GLOBAL RESET ---------------- */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* ---------------- BACKGROUND ---------------- */
+
+body{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:
+        radial-gradient(circle at top, #1f1f1f, #0b0b0b);
+
+    color:#e4e4e4;
+}
+
+/* ---------------- FORM CARD ---------------- */
+
+form{
+    width:380px;
+    padding:40px;
+
+    background: rgba(30,30,30,0.75);
+    backdrop-filter: blur(10px);
+
+    border-radius:14px;
+
+    border:1px solid rgba(255,255,255,0.05);
+
+    box-shadow:
+        0 20px 40px rgba(0,0,0,0.6);
+
+    transition: all 0.3s ease;
+}
+
+form:hover{
+    transform: translateY(-3px);
+}
+
+/* ---------------- HEADINGS ---------------- */
+
+h1, h2{
+    text-align:center;
+    margin-bottom:25px;
+    font-weight:500;
+    letter-spacing:1px;
+    color:#ffffff;
+}
+
+/* ---------------- INPUTS ---------------- */
+
+input, select{
+
+    width:100%;
+    padding:12px;
+
+    margin:12px 0;
+
+    border-radius:8px;
+
+    border:1px solid rgba(255,255,255,0.08);
+
+    background:#111;
+
+    color:#e4e4e4;
+
+    font-size:14px;
+
+    transition:all 0.25s ease;
+}
+
+/* Input focus */
+
+input:focus,
+select:focus{
+
+    outline:none;
+
+    border:1px solid #4c8cff;
+
+    box-shadow:0 0 8px rgba(76,140,255,0.4);
+}
+
+/* ---------------- BUTTON ---------------- */
+
+button{
+
+    width:100%;
+    padding:12px;
+
+    margin-top:15px;
+
+    border:none;
+    border-radius:8px;
+
+    background:linear-gradient(
+        135deg,
+        #4c8cff,
+        #6f5cff
+    );
+
+    color:white;
+
+    font-size:15px;
+
+    cursor:pointer;
+
+    transition:all 0.25s ease;
+}
+
+button:hover{
+
+    transform:translateY(-1px);
+
+    box-shadow:0 8px 18px rgba(76,140,255,0.35);
+}
+
+/* ---------------- LINKS ---------------- */
+
+a{
+    color:#7aa2ff;
+    text-decoration:none;
+}
+
+a:hover{
+    text-decoration:underline;
+}
+
+/* ---------------- PARAGRAPHS ---------------- */
+
+p{
+    text-align:center;
+    margin-top:18px;
+    font-size:14px;
+    color:#aaa;
+}
+
+/* ---------------- FLASH MESSAGES ---------------- */
+
+.flash{
+
+    padding:10px;
+    margin-bottom:15px;
+
+    border-radius:6px;
+
+    font-size:13px;
+
+    text-align:center;
+}
+
+.flash.error{
+    background:#3a1a1a;
+    color:#ff7b7b;
+}
+
+.flash.success{
+    background:#16321f;
+    color:#7bffb0;
+}
