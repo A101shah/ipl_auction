@@ -315,8 +315,13 @@ def bid(player_id):
 
     return redirect("/")
 
+last_bid_team = None   # define globally somewhere in app.py
+
+
 @app.route("/reset_auction", methods=["POST"])
 def reset_auction():
+    global last_bid_team   # access global variable
+
     conn = get_db()
     cur = conn.cursor()
 
@@ -330,11 +335,14 @@ def reset_auction():
     cur.close()
     conn.close()
 
+    last_bid_team = None   # ⭐ IMPORTANT RESET
+
     flash("Auction has been reset successfully.", "success")
     return redirect("/")
 
 @app.route("/reset_player/<int:player_id>", methods=["POST"])
 def reset_player(player_id):
+    global last_bid_team
 
     conn = get_db()
     cur = conn.cursor()
@@ -349,6 +357,8 @@ def reset_player(player_id):
     conn.commit()
     cur.close()
     conn.close()
+
+    last_bid_team = None   # ⭐ reset last bidder
 
     flash("Player auction reset.", "success")
     return redirect("/")
@@ -367,5 +377,6 @@ if __name__ == "__main__":
 
     create_tables()
     insert_teams()
+
 
     app.run(debug=True)
